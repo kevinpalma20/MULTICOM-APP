@@ -6,7 +6,7 @@ export const CardAlert = ({ title, subtitle, icon, elevation }) => {
     <Avatar.Icon
       {...props}
       icon={icon}
-      theme={{ colors: { primary: "#1c243c" } }}
+      theme={{ colors: { primary: "#1c243c" } }} 
       color="#ead42d"
     />
   );
