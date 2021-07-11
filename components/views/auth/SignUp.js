@@ -95,9 +95,7 @@ export const signUp = ({ navigation }) => {
 				<Card.Content style={{ paddingVertical: "2%" }}>
 					<TextInput
 						value={form.nombre}
-						onChangeText={(text) =>
-							handleChange("nombre", text)
-						}
+						onChangeText={(text) => handleChange("nombre", text)}
 						style={{ paddingVertical: "2%" }}
 						mode="outlined"
 						label="Nombre(s)"
@@ -106,9 +104,7 @@ export const signUp = ({ navigation }) => {
 					/>
 					<TextInput
 						value={form.apellido}
-						onChangeText={(text) =>
-							handleChange("apellido", text)
-						}
+						onChangeText={(text) => handleChange("apellido", text)}
 						style={{ paddingVertical: "2%" }}
 						mode="outlined"
 						label="Apellido(s)"
@@ -119,22 +115,16 @@ export const signUp = ({ navigation }) => {
 						value={form.numero}
 						keyboardType="numeric"
 						maxLength={13}
-						onChangeText={(text) =>
-							handleChange("numero", text)
-						}
+						onChangeText={(text) => handleChange("numero", text)}
 						style={{ paddingVertical: "2%" }}
 						mode="outlined"
 						label="Número"
 						theme={{ colors: { primary: "#1c243c" } }}
-						right={
-							<TextInput.Icon name="cellphone" />
-						}
+						right={<TextInput.Icon name="cellphone" />}
 					/>
 					<TextInput
 						value={form.email}
-						onChangeText={(text) =>
-							handleChange("email", text)
-						}
+						onChangeText={(text) => handleChange("email", text)}
 						style={{ paddingVertical: "2%" }}
 						mode="outlined"
 						label="Correo eletrónico"
@@ -155,18 +145,14 @@ export const signUp = ({ navigation }) => {
 						mode="contained"
 						theme={{ colors: { primary: "#1c243c" } }}
 					>
-						<Text style={{ color: "#ead42d" }}>
-							Registrarse
-						</Text>
+						<Text style={{ color: "#ead42d" }}>Registrarse</Text>
 					</Button>
 					<Button
 						onPress={clearInputs}
 						style={{ width: "50%" }}
 						theme={{ colors: { primary: "#1c243c" } }}
 					>
-						<Text style={{ color: "#1c243c" }}>
-							Limpiar
-						</Text>
+						<Text style={{ color: "#1c243c" }}>Limpiar</Text>
 					</Button>
 				</Card.Actions>
 			</Card>
@@ -179,9 +165,7 @@ export const signUp = ({ navigation }) => {
 				showCancelButton={awesomeAlert.btnCancel}
 				showConfirmButton={awesomeAlert.btnConfirm}
 				onConfirmPressed={_signUp}
-				onCancelPressed={() =>
-					setAwesomeAlert({ showAlert: false })
-				}
+				onCancelPressed={() => setAwesomeAlert({ showAlert: false })}
 				confirmButtonColor="#1c243c"
 				closeOnTouchOutside={awesomeAlert.closeTouchOutside}
 			/>
