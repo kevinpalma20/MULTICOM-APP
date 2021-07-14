@@ -14,7 +14,7 @@ export const SignIn = ({ navigation }) => {
 
 	const [form, setForm] = React.useState({
 		email: "bebarmyga@gmail.com",
-		password: "contraseña@2",
+		password: "contraseña@21",
 	});
 
 	const [secureTextEntry, setSecureTextEntry] = React.useState(true);

@@ -1,40 +1,68 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
+import {
+	ScrollView,
+	FlatList,
+	View,
+	ListItem,
+	RefreshControl,
+	SafeAreaView,
+} from "react-native";
+import {
+	Title,
+	Text,
+	Card,
+	Avatar,
+	Button,
+	Snackbar,
+} from "react-native-paper";
+
+import FlatItem from "../../Elements/App/FlatItem";
+import { Container } from "../../../components/Elements/general/ScreenContainer";
+
+import axios from "axios";
+import { useIsFocused } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-import { Container } from "../../../components/Elements/general/ScreenContainer";
-import { Title, Text, Card, Avatar, Button } from "react-native-paper";
-
 export const Home = ({ navigation }) => {
-	const contentRight = (props) => (
-		<>
-			{" "}
-			<Button icon="details">
-				<Text>Ver</Text>
-			</Button>
-			<Button icon="close-circle">
-				<Text>Cancelar</Text>
-			</Button>
-		</>
-	);
+	const [DATA, setDATA] = React.useState("");
+	const [refreshing, setRefreshing] = React.useState(false);
 
-	const contentLeft = (props) => (
-		<>
-			<Avatar.Icon
-				{...props}
-				icon="file"
-				size={40}
-				theme={{ colors: { primary: "#1c243c" } }}
-				color="#ead42d"
-			/>
-		</>
-	);
+	const onRefresh = React.useCallback(async () => {
+		setRefreshing(true);
+		listReservation();
+		setInterval(() => {
+			setRefreshing(false);
+		}, 1000);
+	}, []);
 
+	const listReservation = async () => {
+		const token = await AsyncStorage.getItem("TOKEN");
+		const userDetails = JSON.parse(await AsyncStorage.getItem("USERD"));
+
+		try {
+			const res = await axios.get("/Reservation/ByUserNC/" + userDetails.id, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			setDATA(res.data);
+		} catch (error) {
+			console.log(error.response.data.mensaje);
+		}
+	};
+
+	const renderItem = ({ item }) => <FlatItem item={item} />;
+
+	React.useEffect(() => {
+		listReservation();
+	}, []);
 	return (
 		<Container>
 			<Title
 				style={{
 					margin: "10%",
+					marginTop: "5%",
 					fontWeight: "bold",
 					color: "#1c243c",
 					fontSize: 30,
@@ -42,9 +70,24 @@ export const Home = ({ navigation }) => {
 			>
 				Lista de citas pendientes
 			</Title>
-			<ScrollView contentContainerStyle={{ padding: 20 }}>
-				<Text style={{ marginVertical: "10%" }}>Hola</Text>
-			</ScrollView>
+
+			<SafeAreaView style={{ flex: 1, width: "100%" }}>
+				<FlatList
+					style={{}}
+					data={DATA}
+					renderItem={renderItem}
+					keyExtractor={(item) => item.id.toString()}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+							colors={["#ead42d"]}
+							progressBackgroundColor="#1c243c"
+						/>
+					}
+				/>
+			</SafeAreaView>
+
 			<Button
 				mode="outlined"
 				color="#1c243c"
@@ -58,8 +101,7 @@ export const Home = ({ navigation }) => {
 				<MaterialCommunityIcons color="#1c243c" name="plus" />
 				<Text style={{ color: "#1c243c" }}>Crear una cita</Text>
 			</Button>
-			{/** 
-																		ffffffffffffff
+			{/**  
 			<Button
 				onPress={() =>
 					navigation.push("Details", { name: "React Native School" })
@@ -70,7 +112,19 @@ export const Home = ({ navigation }) => {
 
 			<Button onPress={() => navigation.toggleDrawer()}>
 				<Text>Drawer</Text>
-			</Button> **/}
+			</Button> 
+			<Snackbar
+				visible={true}
+				onDismiss={false}
+				action={{
+					label: "Undo",
+					onPress: () => {
+						// Do something
+					},
+				}}
+			>
+				Hey there! I'm a Snackbar.
+			</Snackbar> **/}
 		</Container>
 	);
 };

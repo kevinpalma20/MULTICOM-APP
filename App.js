@@ -34,9 +34,9 @@ import { Home } from "./components/views/app/Home";
 
 import axios from "axios";
 
-//axios.defaults.baseURL = "http://192.168.43.69:8080";
+axios.defaults.baseURL = "http://192.168.43.69:8080";
 //axios.defaults.baseURL = "http://192.168.1.6:8080";
-axios.defaults.baseURL = "http://localhost:8080";
+//axios.defaults.baseURL = "http://localhost:8080";
 
 const AuthStack = createStackNavigator();
 const Drawer = createDrawerNavigator();

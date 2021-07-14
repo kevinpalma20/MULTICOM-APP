@@ -13,10 +13,12 @@ export const Create = () => {
 	const today = new Date();
 	const [date, setDate] = React.useState(new Date(today));
 
-	const [fecha, setFecha] = React.useState("");
-	const [horaIn, setHoraIn] = React.useState("");
-	const [horaFin, setHoraFin] = React.useState("");
-	const [proposito, setProposito] = React.useState("");
+	const [fecha, setFecha] = React.useState("2021-09-12");
+	const [horaIn, setHoraIn] = React.useState("15:15");
+	const [horaFin, setHoraFin] = React.useState("18:20");
+	const [proposito, setProposito] = React.useState(
+		"Propuesta de producto 1 y cotizar precio.",
+	);
 
 	const [loading, setLoading] = React.useState(false);
 
@@ -24,6 +26,14 @@ export const Create = () => {
 	const [show, setShow] = React.useState(false);
 
 	const [STATE, setSTATE] = React.useState("");
+
+	const [awesomeAlertFrom, setAwesomeAlert1From] = React.useState({
+		show: false,
+		message: "",
+	});
+
+	const handleAlert = (name, value) =>
+		setAwesomeAlert1From({ ...awesomeAlertFrom, [name]: value });
 
 	const onChange = (event, selectedDate) => {
 		const currentDate = selectedDate || date;
@@ -78,10 +88,36 @@ export const Create = () => {
 		setProposito("");
 	};
 
-	const sendReservation = () => {
+	const sendReservation = async () => {
+		let message = "";
+		const userDetails = JSON.parse(await AsyncStorage.getItem("USERD"));
+		const token = await AsyncStorage.getItem("TOKEN");
+
 		setLoading(true);
 		try {
-		} catch (error) {}
+			const res = await axios.post(
+				"/Reservation/createReservationByClient",
+				{
+					fecha: fecha,
+					horaInicio: horaIn,
+					horaFin: horaFin,
+					propocito: proposito,
+					idusuario: userDetails.id,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
+			message = res.data.mensaje;
+		} catch (error) {
+			message = error.response.data.mensaje;
+		} finally {
+			setAwesomeAlert1From({ show: true, message: message });
+			setLoading(false);
+			clearInputs();
+		}
 	};
 
 	React.useEffect(() => {});
@@ -152,6 +188,19 @@ export const Create = () => {
 								onChange={onChange}
 							/>
 						)}
+						<AwesomeAlert
+							title="MULTICOM"
+							closeOnTouchOutside={false}
+							closeOnHardwareBackPress={false}
+							show={awesomeAlertFrom.show}
+							message={awesomeAlertFrom.message}
+							confirmText={"Aceptar"}
+							showConfirmButton={true}
+							confirmButtonColor="#1c243c"
+							onConfirmPressed={() => {
+								handleAlert("show", false);
+							}}
+						/>
 					</ScrollView>
 				</Card.Content>
 				<Card.Actions>
