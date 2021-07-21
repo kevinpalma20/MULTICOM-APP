@@ -5,10 +5,11 @@ import { Container } from "../../Elements/general/ScreenContainer";
 import { CardAlert } from "../../Elements/general/CardAlert";
 
 import axios from "axios";
+import Toast from "react-native-toast-message";
 import AwesomeAlert from "react-native-awesome-alerts";
 
 export const Recovery = ({ navigation }) => {
-	const [email, setEmail] = React.useState("primapp6@gmail.com");
+	const [email, setEmail] = React.useState("");
 
 	const [loadingBtn, setLoadingBtn] = React.useState(false);
 
@@ -19,15 +20,6 @@ export const Recovery = ({ navigation }) => {
 		btnCancel: true,
 		btnConfirm: true,
 		textCancel: "",
-		textConfirm: "",
-		closeTouchOutside: true,
-	});
-
-	const [awesomeAlert1, setAwesomeAlert1] = React.useState({
-		showAlert: false,
-		message: "",
-		title: "",
-		btnConfirm: true,
 		textConfirm: "",
 		closeTouchOutside: true,
 	});
@@ -45,9 +37,8 @@ export const Recovery = ({ navigation }) => {
 	};
 
 	const recoveryPassowrd = async () => {
-		let mensaje = "";
+		let message = "";
 		setAwesomeAlert({ showAlert: false });
-		setLoadingBtn(true);
 
 		try {
 			const res = await axios.post("/recovery/password", {
@@ -55,12 +46,16 @@ export const Recovery = ({ navigation }) => {
 			});
 			mensaje = res.data.mensaje;
 		} catch (error) {
-			mensaje = error.response.data.mensaje;
+			message = error.response.data.mensaje;
 		} finally {
-			setAwesomeAlert1({
-				showAlert: true,
-				title: "MULTICOM",
-				message: mensaje,
+			Toast.show({
+				type: "error",
+				position: "bottom",
+				text1: "MULTICOM",
+				text2: message,
+				visibilityTime: 4000,
+				autoHide: true,
+				bottomOffset: 40,
 			});
 			setLoadingBtn(false);
 			setEmail("");
@@ -122,17 +117,6 @@ export const Recovery = ({ navigation }) => {
 				onConfirmPressed={recoveryPassowrd}
 				confirmButtonColor="#1c243c"
 				closeOnTouchOutside={awesomeAlert.closeTouchOutside}
-			/>
-
-			<AwesomeAlert
-				show={awesomeAlert1.showAlert}
-				title={awesomeAlert1.title}
-				message={awesomeAlert1.message}
-				confirmText={awesomeAlert1.textConfirm}
-				showConfirmButton={awesomeAlert1.btnConfirm}
-				onConfirmPressed={() => setAwesomeAlert1({ showAlert: false })}
-				confirmButtonColor="#1c243c"
-				closeOnTouchOutside={awesomeAlert1.closeTouchOutside}
 			/>
 		</Container>
 	);

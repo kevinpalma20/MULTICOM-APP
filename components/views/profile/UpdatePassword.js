@@ -6,9 +6,9 @@ import { Container } from "../../Elements/general/ScreenContainer";
 import { CardAlert } from "../../Elements/general/CardAlert";
 import { AuthContext } from "../../../context/context";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import AwesomeAlert from "react-native-awesome-alerts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const UpdatePassword = () => {
 	const { signOut } = React.useContext(AuthContext);
@@ -41,27 +41,6 @@ export const UpdatePassword = () => {
 	const RightContent = (nameProp, valProp) => (
 		<TextInput.Icon name="eye" onPress={() => handleSecure(nameProp, valProp)} />
 	);
-
-	const TextSecure = ({
-		inputLabel,
-		value,
-		propVal,
-		secureProp,
-		securePropName,
-		valSecure,
-	}) => {
-		return (
-			<TextInput
-				label={inputLabel}
-				style={{ marginBottom: "5%" }}
-				value={value}
-				theme={{ colors: { primary: "#1c243c" } }}
-				secureTextEntry={secureProp}
-				onChangeText={(text) => handleText(propVal, text)}
-				right={RightContent(securePropName, valSecure)}
-			/>
-		);
-	};
 
 	const clearInputs = () => {
 		try {
@@ -133,29 +112,43 @@ export const UpdatePassword = () => {
 			<ScrollView>
 				<Card>
 					<Card.Content>
-						<TextSecure
-							propVal="passwordOld"
-							inputLabel="Contraseña antigua"
+						<TextInput
+							label="Contraseña antigua"
+							style={{ marginBottom: "5%" }}
 							value={groupPasswords.passwordOld}
-							securePropName="securityPasswordOld"
-							secureProp={securePasswords.securityPasswordOld}
-							valSecure={!securePasswords.securityPasswordOld}
+							theme={{ colors: { primary: "#1c243c" } }}
+							secureTextEntry={securePasswords.securityPasswordOld}
+							onChangeText={(text) => handleText("passwordOld", text)}
+							right={RightContent(
+								"securityPasswordOld",
+								!securePasswords.securityPasswordOld,
+							)}
 						/>
-						<TextSecure
-							propVal="passwordNew"
-							inputLabel="Nueva contraseña"
+
+						<TextInput
+							label="Nueva contraseña"
+							style={{ marginBottom: "5%" }}
 							value={groupPasswords.passwordNew}
-							securePropName="securityPasswordNew"
-							secureProp={securePasswords.securityPasswordNew}
-							valSecure={!securePasswords.securityPasswordNew}
+							theme={{ colors: { primary: "#1c243c" } }}
+							secureTextEntry={securePasswords.securityPasswordNew}
+							onChangeText={(text) => handleText("passwordNew", text)}
+							right={RightContent(
+								"securityPasswordNew",
+								!securePasswords.securityPasswordNew,
+							)}
 						/>
-						<TextSecure
-							propVal="passwordConfirm"
-							inputLabel="Confirmar contraseña"
+
+						<TextInput
+							label="Confirmar contraseña"
+							style={{ marginBottom: "5%" }}
 							value={groupPasswords.passwordConfirm}
-							securePropName="securityPasswordConfirm"
-							valSecure={!securePasswords.securityPasswordConfirm}
-							secureProp={securePasswords.securityPasswordConfirm}
+							theme={{ colors: { primary: "#1c243c" } }}
+							secureTextEntry={securePasswords.securityPasswordConfirm}
+							onChangeText={(text) => handleText("passwordConfirm", text)}
+							right={RightContent(
+								"securityPasswordConfirm",
+								!securePasswords.securityPasswordConfirm,
+							)}
 						/>
 					</Card.Content>
 					<Card.Actions>

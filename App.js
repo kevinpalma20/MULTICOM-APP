@@ -5,12 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {
-	createDrawerNavigator,
-	DrawerContentScrollView,
-	DrawerItemList,
-	DrawerItem,
-} from "@react-navigation/drawer";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 
 import { time } from "./context/time";
 import { AuthContext } from "./context/context";
@@ -28,11 +23,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isJwtExpired } from "jwt-check-expiration";
 
 import { Create } from "./components/views/app/reservations/Create";
+import { Details } from "./components/views/app/reservations/Details";
+import { Reclaim } from "./components/views/app/reservations/Reclaim";
 
-import { Search, Details, Search2 } from "./screens/screens";
+import { Search } from "./screens/screens";
 import { Home } from "./components/views/app/Home";
 
+import Toast from "react-native-toast-message";
 import axios from "axios";
+
+import {
+	useFonts,
+	Inter_100Thin,
+	Inter_200ExtraLight,
+	Inter_300Light,
+	Inter_400Regular,
+	Inter_500Medium,
+	Inter_600SemiBold,
+	Inter_700Bold,
+	Inter_800ExtraBold,
+	Inter_900Black,
+} from "@expo-google-fonts/inter";
 
 axios.defaults.baseURL = "http://192.168.43.69:8080";
 //axios.defaults.baseURL = "http://192.168.1.6:8080";
@@ -43,7 +54,7 @@ const Drawer = createDrawerNavigator();
 const Tabs = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const RootStack = createStackNavigator();
-const SearchStack = createStackNavigator();
+const CancelStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 
 const AuthStackScreen = () => (
@@ -91,18 +102,39 @@ const HomeStackScreen = () => (
 		<HomeStack.Screen
 			name="Details"
 			component={Details}
-			options={({ route }) => ({
-				title: route.params.name,
-			})}
+			options={{ headerTitle: "Sección de detalle" }}
+		/>
+
+		<HomeStack.Screen
+			name="Reclaim"
+			component={Reclaim}
+			options={{ headerTitle: "Sección de Reclamo" }}
 		/>
 	</HomeStack.Navigator>
 );
 
-const SearchStackScreen = () => (
-	<SearchStack.Navigator>
-		<SearchStack.Screen name="Search" component={Search} />
-		<SearchStack.Screen name="Search2" component={Search2} />
-	</SearchStack.Navigator>
+const HomeCancelStack = () => (
+	<CancelStack.Navigator
+		screenOptions={{
+			headerTintColor: "#ead42d",
+			headerStyle: { backgroundColor: "#1c243c" },
+		}}
+	>
+		<CancelStack.Screen
+			name="Search"
+			component={Search}
+			options={{
+				headerTitle: "MENÚ",
+				headerLeft: () => <IconMulticom />,
+			}}
+		/>
+
+		<CancelStack.Screen
+			name="Details"
+			component={Details}
+			options={{ headerTitle: "Sección de detalle" }}
+		/>
+	</CancelStack.Navigator>
 );
 
 const ProfileStackScreen = () => (
@@ -147,7 +179,6 @@ const TabsScreen = () => (
 				tabBarIcon: ({ color }) => (
 					<MaterialCommunityIcons color={color} name="file" size={25} />
 				),
-				tabBarBadge: 3,
 			}}
 			component={HomeStackScreen}
 		/>
@@ -159,17 +190,56 @@ const TabsScreen = () => (
 					<MaterialCommunityIcons color={color} name="cancel" size={25} />
 				),
 			}}
-			component={SearchStackScreen}
+			component={HomeCancelStack}
 		/>
 	</Tabs.Navigator>
 );
 
-const DrawerScreen = () => (
-	<Drawer.Navigator initialRouteName="Home">
-		<Drawer.Screen name="Home" component={TabsScreen} />
-		<Drawer.Screen name="Profile" component={ProfileStackScreen} />
-	</Drawer.Navigator>
-);
+const DrawerScreen = () => {
+	const dimensions = useWindowDimensions();
+
+	return (
+		<Drawer.Navigator
+			initialRouteName="Home"
+			drawerContentOptions={{
+				activeTintColor: "#1c243c",
+				inactiveTintColor: "#9c9b95",
+				inactiveBackgroundColor: "white",
+				activeBackgroundColor: "#ead42d",
+
+				labelStyle: {
+					marginLeft: 6,
+					fontWeight: "700",
+					fontSize: 17,
+				},
+			}}
+			drawerType={dimensions.width >= 768 ? "permanent" : "front"}
+			overlayColor={dimensions.width >= 768 ? "transparent" : "rgba(0, 0, 0, 0.7)"}
+		>
+			<Drawer.Screen
+				name="Home"
+				component={TabsScreen}
+				//component={HomeStackScreen}
+				options={{
+					title: "Mi menú",
+					drawerIcon: ({ color }) => (
+						<MaterialCommunityIcons color={color} name="home" size={25} />
+					),
+				}}
+			/>
+			<Drawer.Screen
+				name="Profile"
+				component={ProfileStackScreen}
+				options={{
+					title: "Mi perfil",
+					drawerIcon: ({ color }) => (
+						<MaterialCommunityIcons color={color} name="face-profile" size={25} />
+					),
+				}}
+			/>
+		</Drawer.Navigator>
+	);
+};
 
 const RootStackScreen = ({ verifyToken }) => (
 	<RootStack.Navigator headerMode="none">
@@ -177,19 +247,31 @@ const RootStackScreen = ({ verifyToken }) => (
 			<RootStack.Screen
 				name="Auth"
 				component={AuthStackScreen}
-				options={{ animationEnabled: false }}
+				options={{ animationEnabled: true }}
 			/>
 		) : (
 			<RootStack.Screen
 				name="App"
 				component={DrawerScreen}
-				options={{ animationEnabled: false }}
+				options={{ animationEnabled: true }}
 			/>
 		)}
 	</RootStack.Navigator>
 );
 
 export default () => {
+	let [fontsLoaded] = useFonts({
+		Inter_100Thin,
+		Inter_200ExtraLight,
+		Inter_300Light,
+		Inter_400Regular,
+		Inter_500Medium,
+		Inter_600SemiBold,
+		Inter_700Bold,
+		Inter_800ExtraBold,
+		Inter_900Black,
+	});
+
 	const [isLoading, setIsLoading] = React.useState(true);
 	const [userToken, setUserToken] = React.useState(null);
 
@@ -222,13 +304,16 @@ export default () => {
 	}, []);
 
 	return (
-		<LoadIng loading={isLoading}>
-			<AuthContext.Provider value={authContext}>
-				<StatusBar backgroundColor="#ead42d" barStyle={"dark-content"} />
-				<NavigationContainer>
-					<RootStackScreen verifyToken={userToken} />
-				</NavigationContainer>
-			</AuthContext.Provider>
-		</LoadIng>
+		<View style={{ flex: 1, justifyContent: "space-around" }}>
+			<LoadIng loading={isLoading}>
+				<AuthContext.Provider value={authContext}>
+					<StatusBar backgroundColor="#ead42d" barStyle={"dark-content"} />
+					<NavigationContainer>
+						<RootStackScreen verifyToken={userToken} />
+					</NavigationContainer>
+				</AuthContext.Provider>
+				<Toast ref={(ref) => Toast.setRef(ref)} />
+			</LoadIng>
+		</View>
 	);
 };

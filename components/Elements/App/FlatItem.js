@@ -1,20 +1,19 @@
 import React from "react";
-import { Button, Snackbar } from "react-native-paper";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { Button, Card, Title, Paragraph } from "react-native-paper";
+import { View, Text, StyleSheet, center } from "react-native"; //https://picsum.photos/
+import { useNavigation } from "@react-navigation/native";
+
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import axios from "axios";
+import Toast from "react-native-toast-message";
 import AwesomeAlert from "react-native-awesome-alerts";
-import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FlatItem = ({ item }) => {
+	const navigation = useNavigation();
 	const [awesomeAlertFrom, setAwesomeAlert1From] = React.useState({
 		show: false,
-	});
-
-	const [awesomeAlertFrom1, setAwesomeAlert1From1] = React.useState({
-		show: false,
-		message: "",
 	});
 
 	const handleAlert = (name, value) =>
@@ -36,40 +35,101 @@ const FlatItem = ({ item }) => {
 					},
 				},
 			);
-			//console.log(res.data.mensaje);
 			mssg = res.data.mensaje;
 		} catch (error) {
 			mssg = error.response.data.mensaje;
 		} finally {
-			setAwesomeAlert1From1({ show: true, message: mssg });
+			Toast.show({
+				type: "success",
+				position: "bottom",
+				text1: "MULTICOM",
+				text2: mssg,
+				visibilityTime: 4000,
+				autoHide: true,
+				bottomOffset: 40,
+			});
 		}
 	};
 
 	React.useEffect(() => {}, []);
 
 	return (
-		<View style={styles.itemContainer}>
-			<TouchableOpacity>
-				<Text>{item.fecha}</Text>
-				<View style={{ flexDirection: "row" }}>
-					<Text style={{ color: "#8395a7" }}>{item.horaInicio}</Text>
-					<Text style={{ color: "#8395a7", marginLeft: "5%" }}>{item.horaFin}</Text>
-				</View>
-				{/* <Text style={styles.itemTitle}>{task.title}</Text>
-				<Text style={{ color: "#8395a7" }}>{task.description}</Text> */}
-			</TouchableOpacity>
-			<Button style={{ padding: 1, borderRadius: 5 }} color="#1c243c">
-				<Text>RECLAMO</Text>
-			</Button>
-			<Button
-				style={{ padding: 3, borderRadius: 5 }}
-				onPress={() => handleAlert("show", true)}
-				//onPress={onToggleSnackBar}
-				color="red"
-				icon="close-octagon"
-			>
-				<Text style={{ color: "red" }}>CANCELAR</Text>
-			</Button>
+		<>
+			<Card style={styles.itemContainer}>
+				<Card.Content>
+					<View style={{ flexDirection: "row" }}>
+						<View style={{ flexDirection: "column", marginHorizontal: "2%" }}>
+							<Title style={{ fontFamily: "Inter_500Medium" }}>Fecha</Title>
+							<Paragraph style={{ fontFamily: "Inter_300Light" }}>
+								{item.fecha}
+							</Paragraph>
+						</View>
+						<View style={{ flexDirection: "column", marginHorizontal: "2%" }}>
+							<Title style={{ fontFamily: "Inter_500Medium" }}>Horario</Title>
+							<View style={{ flexDirection: "row" }}>
+								<Paragraph style={{ fontFamily: "Inter_300Light" }}>
+									{item.horaInicio}
+								</Paragraph>
+								<Paragraph style={{ fontFamily: "Inter_300Light", marginLeft: "10%" }}>
+									{item.horaFin}
+								</Paragraph>
+							</View>
+						</View>
+						{item.estado == "Solicitada por un cliente (o usted)." ? (
+							<View style={{ flexDirection: "column", marginLeft: "7%" }}>
+								<Title style={{ fontFamily: "Inter_500Medium" }}>Estado</Title>
+								<MaterialCommunityIcons color="#1c243c" name="check-circle" size={30} />
+							</View>
+						) : (
+							<View style={{ flexDirection: "column", marginLeft: "7%" }}>
+								<Title style={{ fontFamily: "Inter_500Medium" }}>Estado</Title>
+								<MaterialCommunityIcons color="red" name="alert" size={30} />
+							</View>
+						)}
+					</View>
+					<Paragraph
+						style={{ fontFamily: "Inter_600SemiBold", marginVertical: "1%" }}
+					>
+						{item.proposito}
+					</Paragraph>
+				</Card.Content>
+				<Card.Actions>
+					<Button
+						icon="details"
+						color="green"
+						onPress={() => {
+							navigation.navigate("Details", { idReservation: item.id });
+						}}
+					>
+						<Text style={{ fontFamily: "Inter_300Light" }}>VER DETALLE</Text>
+					</Button>
+					{item.estado == "Cita expirada." || item.estado == "Cita cancelada" ? (
+						<Button
+							icon="emoticon-sad-outline"
+							color="orange"
+							onPress={() => {
+								navigation.navigate("Reclaim", { idReservation: item.id });
+							}}
+						>
+							<Text style={{ fontFamily: "Inter_300Light" }}>RECLAMO</Text>
+						</Button>
+					) : (
+						<></>
+					)}
+					{item.estado != "Cita cancelada" ? (
+						<Button
+							onPress={() => handleAlert("show", true)}
+							color="red"
+							icon="close-octagon"
+						>
+							<Text style={{ fontFamily: "Inter_300Light" }}>CANCELAR CITA</Text>
+						</Button>
+					) : (
+						<></>
+					)}
+				</Card.Actions>
+			</Card>
+
 			<AwesomeAlert
 				title="MULTICOM"
 				closeOnTouchOutside={false}
@@ -84,30 +144,18 @@ const FlatItem = ({ item }) => {
 				onCancelPressed={() => handleAlert("show", false)}
 				onConfirmPressed={() => cancelReservation(item.id)}
 			/>
-			<AwesomeAlert
-				title="MULTICOM"
-				closeOnTouchOutside={false}
-				closeOnHardwareBackPress={false}
-				show={awesomeAlertFrom1.show}
-				message={awesomeAlertFrom1.message}
-				confirmText={"Aceptar"}
-				showConfirmButton={true}
-				confirmButtonColor="#1c243c"
-				onConfirmPressed={() => setAwesomeAlert1From1({ show: false })}
-			/>
-		</View>
+		</>
 	);
 };
 
 const styles = StyleSheet.create({
 	itemContainer: {
-		backgroundColor: "white",
-		padding: 20,
-		marginVertical: 8,
+		marginVertical: "2%",
+		marginHorizontal: "4%",
 		flexDirection: "row",
-		justifyContent: "space-between",
 		alignItems: "center",
-		borderRadius: 5,
+		borderRadius: 15,
+		width: "92%",
 
 		shadowColor: "#000",
 		shadowOffset: {
@@ -117,7 +165,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.27,
 		shadowRadius: 4.65,
 
-		elevation: 6,
+		elevation: 9,
 	},
 });
 

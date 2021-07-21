@@ -3,10 +3,9 @@ import { Card, TextInput, Text, Button } from "react-native-paper";
 
 import { AuthContext } from "../../../context/context";
 import { Container } from "../../Elements/general/ScreenContainer";
-import { LoadIng } from "../../Elements/general/Loading";
 
 import axios from "axios";
-import AwesomeAlert from "react-native-awesome-alerts";
+import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SignIn = ({ navigation }) => {
@@ -20,16 +19,6 @@ export const SignIn = ({ navigation }) => {
 	const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
 	const [loadingBtn, setLoadingBtn] = React.useState(false);
-	const [awesomeAlert, setAwesomeAlert] = React.useState({
-		showAlert: false,
-		message: "",
-		title: "",
-		btnCancel: true,
-		btnConfirm: true,
-		textCancel: "",
-		textConfirm: "",
-		closeTouchOutside: true,
-	});
 
 	const clearInputs = async () => {
 		setForm({
@@ -54,19 +43,24 @@ export const SignIn = ({ navigation }) => {
 		} catch (error) {
 			message = error.response.data.mensaje;
 
-			setAwesomeAlert({
-				showAlert: true,
-				message: message,
-				title: "MULTICOM",
-				btnConfirm: true,
-				textConfirm: "Aceptar",
+			Toast.show({
+				type: "error",
+				position: "bottom",
+				text1: "MULTICOM",
+				text2: message,
+				visibilityTime: 4000,
+				autoHide: true,
+				bottomOffset: 40,
 			});
+
 			clearInputs();
 			setLoadingBtn(false);
 		}
 	};
 
 	const handleChange = (name, value) => setForm({ ...form, [name]: value });
+
+	React.useEffect(() => {}, []);
 
 	return (
 		<Container>
@@ -139,20 +133,6 @@ export const SignIn = ({ navigation }) => {
 					<Text style={{ color: "#1c243c" }}>¿Olvidó su contraseña?</Text>
 				</Button>
 			</Card>
-			<AwesomeAlert
-				show={awesomeAlert.showAlert}
-				title={awesomeAlert.title}
-				message={awesomeAlert.message}
-				confirmText={awesomeAlert.textConfirm}
-				showConfirmButton={awesomeAlert.btnConfirm}
-				onConfirmPressed={() =>
-					setAwesomeAlert({
-						showAlert: false,
-					})
-				}
-				confirmButtonColor="#1c243c"
-				closeOnTouchOutside={awesomeAlert.closeTouchOutside}
-			/>
 		</Container>
 	);
 };

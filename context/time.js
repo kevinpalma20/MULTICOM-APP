@@ -1,1 +1,1 @@
-export const time = 100;
+export const time = 800;

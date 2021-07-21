@@ -5,6 +5,7 @@ import { Text, Card, Button, TextInput } from "react-native-paper";
 import { Container } from "../../../../components/Elements/general/ScreenContainer";
 
 import axios from "axios";
+import Toast from "react-native-toast-message";
 import AwesomeAlert from "react-native-awesome-alerts";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,11 +14,11 @@ export const Create = () => {
 	const today = new Date();
 	const [date, setDate] = React.useState(new Date(today));
 
-	const [fecha, setFecha] = React.useState("2021-09-12");
-	const [horaIn, setHoraIn] = React.useState("15:15");
-	const [horaFin, setHoraFin] = React.useState("18:20");
+	const [fecha, setFecha] = React.useState(today.toISOString().substr(0, 10));
+	const [horaIn, setHoraIn] = React.useState();
+	const [horaFin, setHoraFin] = React.useState();
 	const [proposito, setProposito] = React.useState(
-		"Propuesta de producto 1 y cotizar precio.",
+		"Propuesta de marketing para producto 1 y cotizar precio.",
 	);
 
 	const [loading, setLoading] = React.useState(false);
@@ -120,7 +121,10 @@ export const Create = () => {
 		}
 	};
 
-	React.useEffect(() => {});
+	React.useEffect(() => {
+		setHoraIn(extracTime(today));
+		setHoraFin(extracTime(today));
+	}, []);
 
 	return (
 		<Container>
@@ -136,7 +140,18 @@ export const Create = () => {
 					FORMULARIO
 				</Text>
 				<Card.Content style={{ paddingVertical: "2%" }}>
-					<ScrollView>
+					<>
+						<TextInput
+							mode="outlined"
+							value={proposito}
+							onChangeText={(text) => setProposito(text)}
+							style={{ width: "100%" }}
+							theme={{ colors: { primary: "#1c243c" } }}
+							placeholder="¿Algún motivo?"
+							multiline={true}
+							numberOfLines={4}
+							right={<TextInput.Icon name="text" />}
+						/>
 						<TextInput
 							mode="outlined"
 							style={{ width: "100%" }}
@@ -166,18 +181,6 @@ export const Create = () => {
 							editable={false}
 						/>
 
-						<TextInput
-							mode="outlined"
-							value={proposito}
-							onChangeText={(text) => setProposito(text)}
-							style={{ width: "100%" }}
-							theme={{ colors: { primary: "#1c243c" } }}
-							placeholder="¿Algún motivo?"
-							multiline={true}
-							numberOfLines={4}
-							right={<TextInput.Icon name="text" />}
-						/>
-
 						{show && (
 							<DateTimePicker
 								testID="dateTimePicker"
@@ -201,7 +204,7 @@ export const Create = () => {
 								handleAlert("show", false);
 							}}
 						/>
-					</ScrollView>
+					</>
 				</Card.Content>
 				<Card.Actions>
 					<Button

@@ -5,8 +5,8 @@ import { AuthContext } from "../../../context/context";
 import { Container } from "../../Elements/general/ScreenContainer";
 
 import axios from "axios";
+import Toast from "react-native-toast-message";
 import AwesomeAlert from "react-native-awesome-alerts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const signUp = ({ navigation }) => {
 	const [loadingBtn, setLoadingBtn] = React.useState(false);
@@ -66,12 +66,14 @@ export const signUp = ({ navigation }) => {
 		} catch (error) {
 			message = error.response.data.mensaje;
 		} finally {
-			setAwesomeAlert({
-				showAlert: true,
-				message: message,
-				title: "MULTICOM",
-				btnCancel: true,
-				textCancel: "Ok",
+			Toast.show({
+				type: "error",
+				position: "bottom",
+				text1: "MULTICOM",
+				text2: message,
+				visibilityTime: 4000,
+				autoHide: true,
+				bottomOffset: 40,
 			});
 			clearInputs();
 			setLoadingBtn(false);
