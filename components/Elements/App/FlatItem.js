@@ -1,6 +1,16 @@
 import React from "react";
-import { Button, Card, Title, Paragraph } from "react-native-paper";
-import { View, Text, StyleSheet, center } from "react-native"; //https://picsum.photos/
+import {
+	Button,
+	Card,
+	Title,
+	Paragraph,
+} from "react-native-paper";
+import {
+	View,
+	Text,
+	StyleSheet,
+	center,
+} from "react-native"; //https://picsum.photos/
 import { useNavigation } from "@react-navigation/native";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -12,12 +22,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FlatItem = ({ item }) => {
 	const navigation = useNavigation();
-	const [awesomeAlertFrom, setAwesomeAlert1From] = React.useState({
-		show: false,
-	});
+	const [awesomeAlertFrom, setAwesomeAlert1From] =
+		React.useState({
+			show: false,
+		});
 
 	const handleAlert = (name, value) =>
-		setAwesomeAlert1From({ ...awesomeAlertFrom, [name]: value });
+		setAwesomeAlert1From({
+			...awesomeAlertFrom,
+			[name]: value,
+		});
 
 	const cancelReservation = async (idRes) => {
 		let mssg = "";
@@ -58,37 +72,82 @@ const FlatItem = ({ item }) => {
 			<Card style={styles.itemContainer}>
 				<Card.Content>
 					<View style={{ flexDirection: "row" }}>
-						<View style={{ flexDirection: "column", marginHorizontal: "2%" }}>
-							<Title style={{ fontFamily: "Inter_500Medium" }}>Fecha</Title>
+						<View
+							style={{
+								flexDirection: "column",
+								marginHorizontal: "2%",
+							}}
+						>
+							<Title style={{ fontFamily: "Inter_500Medium" }}>
+								Fecha
+							</Title>
 							<Paragraph style={{ fontFamily: "Inter_300Light" }}>
 								{item.fecha}
 							</Paragraph>
 						</View>
-						<View style={{ flexDirection: "column", marginHorizontal: "2%" }}>
-							<Title style={{ fontFamily: "Inter_500Medium" }}>Horario</Title>
+						<View
+							style={{
+								flexDirection: "column",
+								marginHorizontal: "2%",
+							}}
+						>
+							<Title style={{ fontFamily: "Inter_500Medium" }}>
+								Horario
+							</Title>
 							<View style={{ flexDirection: "row" }}>
 								<Paragraph style={{ fontFamily: "Inter_300Light" }}>
 									{item.horaInicio}
 								</Paragraph>
-								<Paragraph style={{ fontFamily: "Inter_300Light", marginLeft: "10%" }}>
+								<Paragraph
+									style={{
+										fontFamily: "Inter_300Light",
+										marginLeft: "10%",
+									}}
+								>
 									{item.horaFin}
 								</Paragraph>
 							</View>
 						</View>
-						{item.estado == "Solicitada por un cliente (o usted)." ? (
-							<View style={{ flexDirection: "column", marginLeft: "7%" }}>
-								<Title style={{ fontFamily: "Inter_500Medium" }}>Estado</Title>
-								<MaterialCommunityIcons color="#1c243c" name="check-circle" size={30} />
+						{item.estado ==
+						"Solicitada por un cliente (o usted)." ? (
+							<View
+								style={{
+									flexDirection: "column",
+									marginLeft: "7%",
+								}}
+							>
+								<Title style={{ fontFamily: "Inter_500Medium" }}>
+									Estado
+								</Title>
+								<MaterialCommunityIcons
+									color="green"
+									name="check-circle"
+									size={30}
+								/>
 							</View>
 						) : (
-							<View style={{ flexDirection: "column", marginLeft: "7%" }}>
-								<Title style={{ fontFamily: "Inter_500Medium" }}>Estado</Title>
-								<MaterialCommunityIcons color="red" name="alert" size={30} />
+							<View
+								style={{
+									flexDirection: "column",
+									marginLeft: "7%",
+								}}
+							>
+								<Title style={{ fontFamily: "Inter_500Medium" }}>
+									Estado
+								</Title>
+								<MaterialCommunityIcons
+									color="red"
+									name="alert"
+									size={30}
+								/>
 							</View>
 						)}
 					</View>
 					<Paragraph
-						style={{ fontFamily: "Inter_600SemiBold", marginVertical: "1%" }}
+						style={{
+							fontFamily: "Inter_600SemiBold",
+							marginVertical: "1%",
+						}}
 					>
 						{item.proposito}
 					</Paragraph>
@@ -98,31 +157,45 @@ const FlatItem = ({ item }) => {
 						icon="details"
 						color="green"
 						onPress={() => {
-							navigation.navigate("Details", { idReservation: item.id });
+							navigation.navigate("Details", {
+								idReservation: item.id,
+							});
 						}}
 					>
-						<Text style={{ fontFamily: "Inter_300Light" }}>VER DETALLE</Text>
+						<Text style={{ fontFamily: "Inter_300Light" }}>
+							VER DETALLE
+						</Text>
 					</Button>
-					{item.estado == "Cita expirada." || item.estado == "Cita cancelada" ? (
+					{item.estado == "Cita expirada." &&
+					item.reclamo.length == 0 ? (
 						<Button
 							icon="emoticon-sad-outline"
 							color="orange"
 							onPress={() => {
-								navigation.navigate("Reclaim", { idReservation: item.id });
+								navigation.navigate("Reclaim", {
+									idReservation: item.id,
+								});
 							}}
 						>
-							<Text style={{ fontFamily: "Inter_300Light" }}>RECLAMO</Text>
+							<Text style={{ fontFamily: "Inter_300Light" }}>
+								RECLAMO
+							</Text>
 						</Button>
 					) : (
 						<></>
 					)}
-					{item.estado != "Cita cancelada" ? (
+					{item.estado == "Cita apunto de expirar." ||
+					item.estado == "En proceso." ||
+					item.estado ==
+						"Solicitada por un cliente (o usted)." ? (
 						<Button
 							onPress={() => handleAlert("show", true)}
 							color="red"
 							icon="close-octagon"
 						>
-							<Text style={{ fontFamily: "Inter_300Light" }}>CANCELAR CITA</Text>
+							<Text style={{ fontFamily: "Inter_300Light" }}>
+								CANCELAR CITA
+							</Text>
 						</Button>
 					) : (
 						<></>

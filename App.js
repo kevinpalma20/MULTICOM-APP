@@ -26,7 +26,8 @@ import { Create } from "./components/views/app/reservations/Create";
 import { Details } from "./components/views/app/reservations/Details";
 import { Reclaim } from "./components/views/app/reservations/Reclaim";
 
-import { Search } from "./screens/screens";
+import { Home_Expired } from "./components/views/app/Home_Expired";
+import { Home_Cancel } from "./components/views/app/Home_Cancel";
 import { Home } from "./components/views/app/Home";
 
 import Toast from "react-native-toast-message";
@@ -45,16 +46,20 @@ import {
 	Inter_900Black,
 } from "@expo-google-fonts/inter";
 
-axios.defaults.baseURL = "http://192.168.43.69:8080";
-//axios.defaults.baseURL = "http://192.168.1.6:8080";
+//axios.defaults.baseURL = "http://192.168.43.69:8080";
+//axios.defaults.baseURL = "http://127.0.0.1:8080";
 //axios.defaults.baseURL = "http://localhost:8080";
+axios.defaults.baseURL = "http://10.0.2.2:8080/";
 
 const AuthStack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tabs = createBottomTabNavigator();
-const HomeStack = createStackNavigator();
 const RootStack = createStackNavigator();
+
+const HomeStack = createStackNavigator();
 const CancelStack = createStackNavigator();
+const ExpiredStack = createStackNavigator();
+
 const ProfileStack = createStackNavigator();
 
 const AuthStackScreen = () => (
@@ -104,12 +109,6 @@ const HomeStackScreen = () => (
 			component={Details}
 			options={{ headerTitle: "Sección de detalle" }}
 		/>
-
-		<HomeStack.Screen
-			name="Reclaim"
-			component={Reclaim}
-			options={{ headerTitle: "Sección de Reclamo" }}
-		/>
 	</HomeStack.Navigator>
 );
 
@@ -121,8 +120,8 @@ const HomeCancelStack = () => (
 		}}
 	>
 		<CancelStack.Screen
-			name="Search"
-			component={Search}
+			name="Cancel"
+			component={Home_Cancel}
 			options={{
 				headerTitle: "MENÚ",
 				headerLeft: () => <IconMulticom />,
@@ -135,6 +134,36 @@ const HomeCancelStack = () => (
 			options={{ headerTitle: "Sección de detalle" }}
 		/>
 	</CancelStack.Navigator>
+);
+
+const HomeExpiredStack = () => (
+	<ExpiredStack.Navigator
+		screenOptions={{
+			headerTintColor: "#ead42d",
+			headerStyle: { backgroundColor: "#1c243c" },
+		}}
+	>
+		<ExpiredStack.Screen
+			name="Expired"
+			component={Home_Expired}
+			options={{
+				headerTitle: "MENÚ",
+				headerLeft: () => <IconMulticom />,
+			}}
+		/>
+
+		<ExpiredStack.Screen
+			name="Reclaim"
+			component={Reclaim}
+			options={{ headerTitle: "Reclamo" }}
+		/>
+
+		<ExpiredStack.Screen
+			name="Details"
+			component={Details}
+			options={{ headerTitle: "Sección de detalle" }}
+		/>
+	</ExpiredStack.Navigator>
 );
 
 const ProfileStackScreen = () => (
@@ -175,7 +204,7 @@ const TabsScreen = () => (
 		<Tabs.Screen
 			name="Home"
 			options={{
-				tabBarLabel: "Menu",
+				tabBarLabel: "Citas pendientes",
 				tabBarIcon: ({ color }) => (
 					<MaterialCommunityIcons color={color} name="file" size={25} />
 				),
@@ -183,11 +212,21 @@ const TabsScreen = () => (
 			component={HomeStackScreen}
 		/>
 		<Tabs.Screen
-			name="Search"
+			name="Expired"
+			options={{
+				tabBarLabel: "Citas expiradas",
+				tabBarIcon: ({ color }) => (
+					<MaterialCommunityIcons color={color} name="clock-end" size={25} />
+				),
+			}}
+			component={HomeExpiredStack}
+		/>
+		<Tabs.Screen
+			name="Cancel"
 			options={{
 				tabBarLabel: "Citas canceladas",
 				tabBarIcon: ({ color }) => (
-					<MaterialCommunityIcons color={color} name="cancel" size={25} />
+					<MaterialCommunityIcons color={color} name="file-cancel" size={25} />
 				),
 			}}
 			component={HomeCancelStack}

@@ -6,22 +6,20 @@ import LoadIng from "../../../../components/Elements/general/Loading";
 import { time } from "../../../../context/time";
 
 import axios from "axios";
+import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AwesomeAlert from "react-native-awesome-alerts";
 
 export const Details = ({ route }) => {
 	const [STATE, setSTATE] = React.useState(true);
-	const [awesomeAlertFrom, setAwesomeAlert1From] = React.useState({
-		show: false,
-	});
-
-	const [awesomeAlertFrom1, setAwesomeAlert1From1] = React.useState({
-		show: false,
-		message: "",
-	});
+	const [awesomeAlertFrom, setAwesomeAlert1From] =
+		React.useState({
+			show: false,
+		});
 
 	const cancelReservation = async (idRes) => {
 		let mssg = "";
+		let type = "success";
 		var token = await AsyncStorage.getItem("TOKEN");
 
 		setAwesomeAlert1From({ show: false });
@@ -30,17 +28,22 @@ export const Details = ({ route }) => {
 			const res = await axios.post(
 				"/Reservation/cancelReservation/" + idRes,
 				{},
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				},
+				{ headers: { Authorization: `Bearer ${token}` } },
 			);
 			mssg = res.data.mensaje;
 		} catch (error) {
 			mssg = error.response.data.mensaje;
+			type = "error";
 		} finally {
-			setAwesomeAlert1From1({ show: true, message: mssg });
+			Toast.show({
+				type: type,
+				position: "bottom",
+				text1: "MULTICOM",
+				text2: mssg,
+				visibilityTime: 4000,
+				autoHide: true,
+				bottomOffset: 40,
+			});
 		}
 	};
 
@@ -49,7 +52,9 @@ export const Details = ({ route }) => {
 	const [reclaim, setReclaim] = React.useState([]);
 
 	const labelText = (title, info) => (
-		<View style={{ flexDirection: "row", marginVertical: "1%" }}>
+		<View
+			style={{ flexDirection: "row", marginVertical: "1%" }}
+		>
 			<Text
 				style={{
 					fontSize: 17,
@@ -57,13 +62,14 @@ export const Details = ({ route }) => {
 					fontFamily: "Inter_500Medium",
 				}}
 			>
-				{title + ":"}
+				{title + ": "}
 			</Text>
 			<Text
 				style={{
 					flexDirection: "column",
 					marginLeft: "1%",
 					fontSize: 17,
+					width: "70%",
 					fontFamily: "Inter_300Light",
 				}}
 			>
@@ -96,6 +102,7 @@ export const Details = ({ route }) => {
 			setSTATE(false);
 		}, time);
 		viewDetail();
+		console.log(reclaim);
 	}, []);
 
 	return (
@@ -119,6 +126,7 @@ export const Details = ({ route }) => {
 							{labelText("Hora de inicio", detailsData.horaInicio)}
 							{labelText("Hora final", detailsData.horaFin)}
 							{labelText("Propocito", detailsData.proposito)}
+							<Text>{detailsData.estado}</Text>
 						</Card.Content>
 						<View>
 							{reclaim.length == 0 ? (
@@ -132,21 +140,45 @@ export const Details = ({ route }) => {
 									No se ha realizado ningun reclamo
 								</Text>
 							) : (
-								<>
-									<Text>con reclamo</Text> <Text>Motivo: {reclaim[0].motivo} </Text>{" "}
-									<Text>Descripcion: {reclaim[0].descripcion} </Text>
-								</>
+								<Card style={{ marginTop: "5%" }}>
+									<Title
+										style={{
+											fontFamily: "Inter_600SemiBold",
+											fontSize: 20,
+											marginBottom: "2%",
+										}}
+									>
+										Reclamos
+									</Title>
+									<Card.Content>
+										<Text>Motivo: {reclaim[0].motivo} </Text>
+										<Text>
+											Descripcion: {reclaim[0].descripcion}{" "}
+										</Text>
+									</Card.Content>
+								</Card>
 							)}
 						</View>
 						<Card.Actions>
-							<Button
-								color="red"
-								icon="close-octagon"
-								style={{ width: "100%" }}
-								onPress={() => setAwesomeAlert1From({ show: true })}
-							>
-								<Text style={{ fontFamily: "Inter_300Light" }}>CANCELAR CITA</Text>
-							</Button>
+							{detailsData.estado == "Cita apunto de expirar." ||
+							detailsData.estado == "En proceso." ||
+							detailsData.estado ==
+								"Solicitada por un cliente (o usted)." ? (
+								<Button
+									color="red"
+									icon="close-octagon"
+									style={{ width: "100%" }}
+									onPress={() =>
+										setAwesomeAlert1From({ show: true })
+									}
+								>
+									<Text style={{ fontFamily: "Inter_300Light" }}>
+										CANCELAR CITA
+									</Text>
+								</Button>
+							) : (
+								<></>
+							)}
 						</Card.Actions>
 					</Card>
 
@@ -161,26 +193,19 @@ export const Details = ({ route }) => {
 						cancelText={"Cancelar"}
 						showCancelButton={true}
 						confirmButtonColor="#1c243c"
-						onCancelPressed={() => setAwesomeAlert1From({ show: false })}
-						onConfirmPressed={() => cancelReservation(detailsData.id)}
-					/>
-
-					<AwesomeAlert
-						title="MULTICOM"
-						closeOnTouchOutside={false}
-						closeOnHardwareBackPress={false}
-						show={awesomeAlertFrom1.show}
-						message={awesomeAlertFrom1.message}
-						confirmText={"Aceptar"}
-						showConfirmButton={true}
-						confirmButtonColor="#1c243c"
-						onConfirmPressed={() => setAwesomeAlert1From1({ show: false })}
+						onCancelPressed={() =>
+							setAwesomeAlert1From({ show: false })
+						}
+						onConfirmPressed={() =>
+							cancelReservation(detailsData.id)
+						}
 					/>
 				</View>
 			)}
 		</>
 	);
 };
+
 const styles = StyleSheet.create({
 	itemContainer: {
 		marginVertical: "2%",
